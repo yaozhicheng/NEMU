@@ -130,4 +130,8 @@ config EBREAK_AS_TRAP
   bool "Treat ebreak same as nemu_trap"
   default n
 
+config ENABLE_BRANCH_TRACE
+  bool "Enable branch prediction trace and retrieve the data via local socket."
+  default n
+
 endmenu

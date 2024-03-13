@@ -273,6 +273,10 @@ static inline def_rtl(jrelop, uint32_t relop,
   br_log[br_count].type = 0;
   br_count++;
 #endif // CONFIG_BR_LOG
+#ifdef CONFIG_ENABLE_BRANCH_TRACE
+  printf("[Error] Here is no trace for CONFIG_ENABLE_BRANCH_TRACE=y\n");
+  assert(false);
+#endif
   rtl_j(s, (is_jmp ? target : s->snpc));
 }
 

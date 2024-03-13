@@ -27,6 +27,9 @@ def_EHelper(jal) {
   br_log[br_count].type = 1;
   br_count++;
 #endif // CONFIG_BR_LOG
+#ifdef CONFIG_ENABLE_BRANCH_TRACE
+  report_br_trace(s->pc, id_src1->imm, 1, (&cpu.gpr[1]._64 == s->dest.preg) ? 3:1);
+#endif
   rtl_j(s, id_src1->imm);
 }
 
@@ -47,6 +50,9 @@ def_EHelper(jalr) {
   rtl_li(s, ddest, s->snpc);
 #endif
   IFNDEF(CONFIG_DIFFTEST_REF_NEMU, difftest_skip_dut(1, 3));
+#ifdef CONFIG_ENABLE_BRANCH_TRACE
+  report_br_trace(s->pc, *s0, 1, ((&cpu.gpr[1]._64 == dsrc1) && id_src2->imm == 0) ? 4:2);
+#endif
   rtl_jr(s, s0);
   //printf("%lx,%lx,%d,%d,%lx\n", br_count, cpu.pc, 1, 1, *s0);
 }

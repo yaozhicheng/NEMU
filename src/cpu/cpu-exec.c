@@ -151,13 +151,17 @@ static bool manual_cpt_quit = false;
   } while (0)
 #define rtl_jrelop(s, relop, src1, src2, target)                               \
   do {                                                                         \
+    uint64_t tar = target;                                                     \
+    uint64_t pc = s->pc;                                                       \
     IFDEF(CONFIG_ENABLE_INSTR_CNT, n -= s->idx_in_bb);                         \
     is_ctrl = true;                                                            \
     if (interpret_relop(relop, *src1, *src2)) {                                \
       s = s->tnext;                                                            \
       br_taken = true;                                                         \
-    } else                                                                     \
+    } else{                                                                    \
       s = s->ntnext;                                                           \
+    }                                                                          \
+    report_br_trace(pc, tar, br_taken, 0);                                     \
     goto end_of_bb;                                                            \
   } while (0)
 

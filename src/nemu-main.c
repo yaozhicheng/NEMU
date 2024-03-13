@@ -26,6 +26,10 @@ int main(int argc, char *argv[]) {
   /* Start engine. */
   engine_start();
 
+#ifdef CONFIG_ENABLE_BRANCH_TRACE
+  report_br_trace_join();
+#endif
+
   return is_exit_status_bad();
 }
 #endif

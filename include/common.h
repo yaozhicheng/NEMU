@@ -53,6 +53,13 @@ struct br_info {
   int taken;
   int type; // 0: branch 1: jmp
 };
+
+void report_br_trace(uint64_t pc, uint64_t target, uint32_t taken, uint32_t type);
+
+#ifdef CONFIG_ENABLE_BRANCH_TRACE
+void report_br_trace_join();
+#endif
+
 #include <debug.h>
 
 #endif

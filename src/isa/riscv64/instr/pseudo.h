@@ -67,6 +67,9 @@ def_EHelper(p_jal) {
   br_log[br_count].type = 1;
   br_count++;
 #endif // CONFIG_BR_LOG
+#ifdef CONFIG_ENABLE_BRANCH_TRACE
+  report_br_trace(s->pc, id_src1->imm, 1, &cpu.gpr[1]._64 == s->dest.preg ? 203 : 201);
+#endif
   rtl_j(s, id_src1->imm);
 }
 
@@ -74,10 +77,16 @@ def_EHelper(p_ret) {
 #ifdef CONFIG_SHARE
   // See rvi/control.h:26. JALR should set the LSB to 0.
   rtl_andi(s, s0, &cpu.gpr[1]._64, ~1UL);
+#ifdef CONFIG_ENABLE_BRANCH_TRACE
+  report_br_trace(s->pc, cpu.gpr[1]._64, 1, 200+4);
+#endif
   rtl_jr(s, s0);
 #else
 //  IFDEF(CONFIG_ENGINE_INTERPRETER, rtl_andi(s, s0, s0, ~0x1u));
   IFNDEF(CONFIG_DIFFTEST_REF_NEMU, difftest_skip_dut(1, 2));
+#ifdef CONFIG_ENABLE_BRANCH_TRACE
+  report_br_trace(s->pc, cpu.gpr[1]._64, 1, 200+4);
+#endif
   rtl_jr(s, &cpu.gpr[1]._64);
 #endif // CONFIG_SHARE
 }
