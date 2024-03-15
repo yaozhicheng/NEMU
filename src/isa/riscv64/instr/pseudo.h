@@ -68,7 +68,7 @@ def_EHelper(p_jal) {
   br_count++;
 #endif // CONFIG_BR_LOG
 #ifdef CONFIG_ENABLE_BRANCH_TRACE
-  report_br_trace(s->pc, id_src1->imm, 1, &cpu.gpr[1]._64 == s->dest.preg ? 203 : 201);
+  report_br_trace(s->pc, id_src1->imm, 1, IS_BR_CALL ? 203 : 201);
 #endif
   rtl_j(s, id_src1->imm);
 }

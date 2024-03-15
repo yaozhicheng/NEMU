@@ -57,6 +57,9 @@ struct br_info {
 void report_br_trace(uint64_t pc, uint64_t target, uint32_t taken, uint32_t type);
 
 #ifdef CONFIG_ENABLE_BRANCH_TRACE
+#define IS_CR_LINK(preg) (&cpu.gpr[1]._64 == preg || &cpu.gpr[5]._64 == preg)
+#define IS_BR_CALL IS_CR_LINK(s->dest.preg)
+#define IS_BR_RET ((!IS_BR_CALL) && IS_CR_LINK(s->src1.preg))
 void report_br_trace_join();
 #endif
 
