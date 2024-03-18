@@ -90,6 +90,8 @@ static void update_instr_cnt() {
 void monitor_statistic() {
   update_instr_cnt();
   setlocale(LC_NUMERIC, "");
+#ifdef CONFIG_ENABLE_BRANCH_TRACE
+#else
   Log("host time spent = %'ld us", g_timer);
 #ifdef CONFIG_ENABLE_INSTR_CNT
   Log("total guest instructions = %'ld", g_nr_guest_instr);
@@ -101,6 +103,7 @@ void monitor_statistic() {
         "frequency");
 #else
   Log("CONFIG_ENABLE_INSTR_CNT is not defined");
+#endif
 #endif
 }
 

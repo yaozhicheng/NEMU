@@ -5,6 +5,7 @@ extern "C" {
 
 #ifdef CONFIG_ENABLE_BRANCH_TRACE
 
+#include "branch_trace.h"
 #include <thread>
 #include <mutex>
 #include <chrono>
@@ -14,18 +15,11 @@ extern "C" {
 #include <cstdlib>
 #include <string>
 
-typedef struct {
-    u_int64_t index;
-    u_int64_t pc;
-    u_int64_t target;
-    u_int32_t taken;
-    u_int32_t type;
-} branch_trace;
-
 std::queue<branch_trace> trace_queue;
 std::mutex mtx, qmtx;
 uint64_t __br_trace_index__ = 0;
 bool branch_trace_dump_started = false;
+bool enable_log_trace_to_file = true;
 std::thread task;
 
 void branch_trace_dump(pid_t parent_id){
@@ -60,11 +54,10 @@ void branch_trace_dump(pid_t parent_id){
 }
 
 extern "C" {
-    void report_br_trace(uint64_t pc, uint64_t target, uint32_t taken, uint32_t type){
-        assert(target > 0);
+    void report_br_trace(uint64_t pc, uint64_t target, uint32_t taken, uint32_t type){        
         // start dump thread
         mtx.lock();
-        if (!branch_trace_dump_started){
+        if (!branch_trace_dump_started && enable_log_trace_to_file){
             branch_trace_dump_started = true;
             task = std::thread(branch_trace_dump, getppid());
         }
@@ -86,6 +79,45 @@ extern "C" {
         task.join();
     }
 }
+
+extern "C" {
+void init_monitor(int, char *[]);
+void cpu_exec(uint64_t n);
+}
+
+void br_monitor_init(std::vector<std::string> args){
+    br_monitor_record_log(0);
+    int argc = (int)args.size();
+    char* argv[128] = {0};
+    for(int i = 0; i < 128 || i < argc; i++){
+        argv[i] = (char*) args[i].c_str();
+    }
+    return init_monitor(argc, argv);
+}
+
+bool br_monitor_record_log(int v){
+    if(v == 0){
+        enable_log_trace_to_file = false;
+    }else if(v > 0){
+        enable_log_trace_to_file = true;
+    }
+    return enable_log_trace_to_file;
+}
+
+branch_trace br_monitor_get(int64_t c){
+    while (trace_queue.empty()){
+        if (nemu_state.state == NEMU_END || nemu_state.state == NEMU_ABORT){
+            branch_trace t;
+            t.index = -1;
+            return t;
+        }
+        cpu_exec(c);
+    }
+    auto t = trace_queue.front();
+    trace_queue.pop();
+    return t;
+}
+
 #else
 extern "C" {
     void report_br_trace(uint64_t pc, uint64_t target, uint32_t taken, uint32_t type){}

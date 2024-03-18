@@ -6,6 +6,10 @@ CFLAGS  += -fPIC -D_SHARE=1
 LDFLAGS += -rdynamic -shared -fPIC -Wl,--no-undefined -lz
 endif
 
+ifdef CONFIG_ENABLE_BRANCH_TRACE
+CFLAGS  += -fPIC
+endif
+
 WORK_DIR  = $(shell pwd)
 BUILD_DIR = $(WORK_DIR)/build
 
@@ -24,8 +28,14 @@ CC := $(CCACHE) $(CC)
 LD := $(CCACHE) $(CXX)
 INCLUDES = $(addprefix -I, $(INC_DIR))
 XINCLUDES = $(addprefix -I, $(XINC_DIR))
+
+ifdef CONFIG_ENABLE_BRANCH_TRACE
+$(shell swig -python -c++ -Iinclude  -o src/base/branch_trace_wrapper.cpp include/branch_trace.i)
+PYINCLUDE = $(shell python3-config --includes)
+endif
+
 CFLAGS  := -O2 -MMD -Wall -Werror $(INCLUDES) $(CFLAGS)
-CXXFLAGS  := -O2 -MMD -Wall -Werror --std=c++17 $(XINCLUDES) $(CFLAGS)
+CXXFLAGS  := -O2 -MMD -Wall -Werror --std=c++17 $(XINCLUDES) $(PYINCLUDE) $(CFLAGS)
 LDFLAGS := -O2 $(LDFLAGS)
 # filesystem
 ifndef SHARE
@@ -70,11 +80,18 @@ endif
 
 .PHONY: app clean
 
-app: $(BINARY)
+app: $(BINARY) BRPYTHON
 
 $(BINARY): $(OBJS) $(LIBS)
 	@echo + $(LD) $@
 	@$(LD) -o $@ $(OBJS) $(LDFLAGS) $(LIBS)
+
+ifdef CONFIG_ENABLE_BRANCH_TRACE
+BRPYTHON: $(OBJS) $(LIBS) $(BINARY)
+	mkdir -p $(BUILD_DIR)/NemuBR
+	mv src/base/NemuBR.py $(BUILD_DIR)/NemuBR/__init__.py
+	@$(LD) -o $(BUILD_DIR)/NemuBR/_NemuBR.so $(OBJS) $(LDFLAGS) -shared -rdynamic -fPIC -lz $(LIBS)
+endif
 
 staticlib: $(BUILD_DIR)/lib$(NAME).a
 
