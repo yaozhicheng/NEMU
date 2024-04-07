@@ -11,6 +11,7 @@
 !scripts/runall.sh
 !Kconfig
 !.github/workflows/ci.yml
+!include/branch_trace.i
 include/config
 include/generated
 build
