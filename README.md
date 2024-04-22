@@ -1,3 +1,53 @@
+# Trace Tool
+
+本项目实现了一个基于 NEMU 的 Trace 工具，用于抓取指令级别的分支指令 Trace。
+
+## 构建方法
+
+1. **克隆本项目**
+
+```shell
+git clone https://github.com/yaozhicheng/NEMU.git
+```
+
+2. **设置 $NEMU_HOME**
+
+具体地，你需要将环境变量 `$NEMU_HOME` 设置为本项目的根目录。
+
+3. **初始化本项目**
+
+```shell
+make riscv64-brt-tool_defconfig
+```
+4. **修复 softfloat.a 链接问题**
+
+进入 resource/softfloat/repo/build/Linux-x86_64-GCC/ 编辑 Makefile，在COMPILE_C中添加 -fPIC，之后重新编译，具体过程如下：
+
+```shell
+cd resource/softfloat/repo/build/Linux-x86_64-GCC/
+vim Makefile
+
+# 在 COMPILE_C 中添加 -fPIC
+# COMPILE_C = \
+#  gcc -c -Werror-implicit-function-declaration -fPIC -DSOFTFLOAT_FAST_INT64 \
+#    $(SOFTFLOAT_OPTS) $(C_INCLUDES) -O2 -o $@
+
+# 重新编译
+make clean && make
+```
+
+5. **编译本项目**
+
+回到仓库根目录之后，运行 `make`。
+
+```shell
+make
+```
+
+编译结果位于 `build/NemuBR`。
+
+
+
 # NEMU
 
 NEMU(NJU Emulator) is a simple but complete full-system emulator designed for teaching purpose.
