@@ -81,14 +81,14 @@ extern "C" {
 }
 
 extern "C" {
-void init_monitor(int, char *[]);
+void init_monitor(int, const char *[]);
 void cpu_exec(uint64_t n);
 }
 
 void br_monitor_init(std::vector<std::string> args){
     br_monitor_record_log(0);
     int argc = (int)args.size();
-    char *argv[128] = {nullptr};
+    const char *argv[128] = {nullptr};
     for(int i = 0; i < 128 && i < argc; i++){
         argv[i] = args[i].c_str();
     }
