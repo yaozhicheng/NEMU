@@ -86,8 +86,8 @@ $(BINARY): $(OBJS) $(LIBS)
 	@echo + $(LD) $@
 	@$(LD) -o $@ $(OBJS) $(LDFLAGS) $(LIBS)
 
-ifdef CONFIG_ENABLE_BRANCH_TRACE
 BRPYTHON: $(OBJS) $(LIBS) $(BINARY)
+ifdef CONFIG_ENABLE_BRANCH_TRACE
 	mkdir -p $(BUILD_DIR)/NemuBR
 	mv src/base/NemuBR.py $(BUILD_DIR)/NemuBR/__init__.py
 	@$(LD) -o $(BUILD_DIR)/NemuBR/_NemuBR.so $(OBJS) $(LDFLAGS) -shared -rdynamic -fPIC -lz $(LIBS)
