@@ -7,7 +7,7 @@
 1. **克隆本项目**
 
 ```shell
-git clone https://github.com/yaozhicheng/NEMU.git
+git clone --recurse-submodules https://github.com/yaozhicheng/NEMU.git
 ```
 
 2. **设置 $NEMU_HOME**
